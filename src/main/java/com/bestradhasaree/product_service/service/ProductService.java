@@ -1,6 +1,5 @@
 package com.bestradhasaree.product_service.service;
 
-import com.bestradhasaree.product_service.ProductServiceApplication;
 import com.bestradhasaree.product_service.models.Product;
 
 import java.util.List;

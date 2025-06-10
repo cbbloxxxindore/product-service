@@ -2,6 +2,7 @@ package com.bestradhasaree.product_service.service;
 
 import com.bestradhasaree.product_service.models.Product;
 import com.bestradhasaree.product_service.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.Optional;
 @Service
 public class ProductServiceImpl  implements  ProductService{
     private final ProductRepository productRepository;
-
+@Autowired
     public  ProductServiceImpl(ProductRepository productRepository){
         this.productRepository=productRepository;
     }
@@ -51,7 +52,6 @@ public class ProductServiceImpl  implements  ProductService{
 
     @Override
     public List<Product> getByCategory(String category) {
-        List<Product> productList = productRepository.findByCategory(category);
-        return productList;
+        return productRepository.findByCategory(category);
     }
 }
