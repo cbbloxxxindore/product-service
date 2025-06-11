@@ -1,5 +1,7 @@
 package com.bestradhasaree.product_service.service;
 
+import com.bestradhasaree.product_service.exception.ProductAlreadyExistsException;
+import com.bestradhasaree.product_service.exception.ProductNotFoundException;
 import com.bestradhasaree.product_service.models.Product;
 import com.bestradhasaree.product_service.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +20,18 @@ public class ProductServiceImpl  implements  ProductService{
 
     @Override
     public Product createProduct(Product product) {
+        // ✅ Check for duplicate by name (you can use any unique field)
+        Optional<Product> existing = productRepository.findByName(product.getName());
+        if (existing.isPresent()) {
+            throw new ProductAlreadyExistsException("Product with name '" + product.getName() + "' already exists");
+        }
         return productRepository.save(product);
     }
 
     @Override
     public Product updateProduct(Product updated, Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        Product product = optionalProduct.orElseThrow(() -> new RuntimeException("product not found"));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + id));
         product.setName(updated.getName());
         product.setCategory(updated.getCategory());
         product.setDescription(updated.getDescription());
@@ -36,13 +43,15 @@ public class ProductServiceImpl  implements  ProductService{
 
     @Override
     public Product getProduct(Long id) {
-        return productRepository.findById(id).orElseThrow(() -> new RuntimeException("product not found with id "+id));
-    }
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + id));    }
 
     @Override
     public void deleteProductById(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ProductNotFoundException("Cannot delete. Product not found with ID: " + id);
+        }
         productRepository.deleteById(id);
-
     }
 
     @Override
@@ -52,6 +61,11 @@ public class ProductServiceImpl  implements  ProductService{
 
     @Override
     public List<Product> getByCategory(String category) {
-        return productRepository.findByCategory(category);
+        List<Product> productList=productRepository.findByCategory(category);
+     if( productList.isEmpty())
+     {
+         throw  new ProductNotFoundException("Product not found with category: " + category);
+     }
+        return  productList;
     }
 }
